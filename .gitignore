@@ -4,3 +4,4 @@ cmake-build-*/
 lib.ll
 test.bc
 test.exe
+test.obj
