@@ -59,6 +59,42 @@ namespace utils
         return &builder.GetInsertBlock()->back();
     }
 
+    template<typename _Type = Type, typename _Value = uint64_t>
+    GlobalVariable* create_global(Module& program, const std::string& name, _Type* type, std::vector<_Value> value = { 0 }, size_t offset = 0)
+    {
+        program.getOrInsertGlobal(name, type);
+
+        auto global = program.getNamedGlobal(name);
+        global->setLinkage(GlobalValue::InternalLinkage);
+        
+        if constexpr (std::is_same_v<_Type, ArrayType>)
+        {
+            auto elem_type = type->getArrayElementType();
+            auto bit_size = elem_type->getPrimitiveSizeInBits();
+            auto capacity = type->getArrayNumElements();
+
+            auto make_constant = [&elem_type, &bit_size](_Value value)
+            {
+                return Constant::getIntegerValue(elem_type, APInt(bit_size, value));
+            };
+
+            std::vector<Constant*> constants(capacity, make_constant(0));
+            std::transform(value.begin(), value.end(), constants.begin() + offset, make_constant);
+
+            global->setInitializer(ConstantArray::get(type, makeArrayRef<Constant*>(constants)));
+        }
+        else if constexpr (std::is_same_v<_Type, IntegerType>)
+        {
+            global->setInitializer(Constant::getIntegerValue(type, APInt(type->getPrimitiveSizeInBits(), value[0])));
+        }
+        else
+        {
+            static_assert(false, "unimplemented type");
+        }
+
+        return global;
+    };
+
     Constant* GetIntConstant(Module& program, uint64_t Val, IntegerType* Ty = nullptr)
     {
         if (Ty == nullptr)

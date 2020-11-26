@@ -255,45 +255,23 @@ int main(int argc, char* argv[])
 
     add_externals(program, builder);
 
-    auto create_global = [&program](const std::string& name, Type* type, uint64_t value = 0)
-    {
-        program.getOrInsertGlobal(name, type);
-
-        auto global = program.getNamedGlobal(name);
-        global->setLinkage(GlobalValue::InternalLinkage);
-
-        if (type->isAggregateType())
-            global->setInitializer(ConstantAggregateZero::get(type));
-        else
-            global->setInitializer(Constant::getIntegerValue(type, APInt(type->getPrimitiveSizeInBits(), value)));
-
-        return global;
-    };
-
-    /* set up registers V0-Vf, I, DT and ST */
-    create_global("I", builder.getInt16Ty());
-    auto dt = create_global("DT", builder.getInt8Ty());
+    /* set up registers V0-Vf, I, ST and DT */
+    utils::create_global(program, "I", builder.getInt16Ty());
+    utils::create_global(program, "ST", builder.getInt8Ty());
+    auto dt = utils::create_global(program, "DT", builder.getInt8Ty());
     for (int i = 0; i < 16; ++i)
     {
-        create_global(utils::fmt("V%x", i), builder.getInt8Ty());
+        utils::create_global(program, utils::fmt("V%x", i), builder.getInt8Ty());
     }
 
     /* set up 4kb memory page */
-    auto memory = create_global("memory", ArrayType::get(builder.getInt8Ty(), 4096));
-
-    int i = 0x200;
-    for (auto byte : data)
-    {
-        auto dest = builder.CreateInBoundsGEP(memory, { utils::GetIntConstant(program, 0), utils::GetIntConstant(program, i) });
-        builder.CreateStore(builder.getInt8(byte), dest);
-        i++;
-    }
+    auto memory = utils::create_global(program, "memory", ArrayType::get(builder.getInt8Ty(), 4096), data, 0x200);
 
     /* set up 64*32 screen buffer */
-    create_global("screen", ArrayType::get(builder.getInt8Ty(), 64*32));
+    utils::create_global(program, "screen", ArrayType::get(builder.getInt8Ty(), 64*32));
 
     /* set up stack */
-    create_global("stack", ArrayType::get(builder.getInt16Ty(), 16));
+    utils::create_global(program, "stack", ArrayType::get(builder.getInt16Ty(), 16));
 
     /* set up graphics */
     builder.CreateCall(program.getFunction("init"));
