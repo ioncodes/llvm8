@@ -110,7 +110,15 @@ void add_externals(Module& program, IRBuilder<NoFolder>& builder)
     auto type = FunctionType::get(builder.getInt32Ty(), {}, false);
     program.getOrInsertFunction("rand", type);
 
-    ArrayRef<Type*> args({ builder.getInt8Ty()->getPointerTo(), builder.getInt8Ty()->getPointerTo() });
+    ArrayRef<Type*> args({ builder.getInt32Ty() });
+    type = FunctionType::get(builder.getVoidTy(), args, false);
+    program.getOrInsertFunction("srand", type);
+
+    args = { builder.getInt32Ty() };
+    type = FunctionType::get(builder.getInt32Ty(), args, false);
+    program.getOrInsertFunction("time", type);
+
+    args = { builder.getInt8Ty()->getPointerTo(), builder.getInt8Ty()->getPointerTo() };
     type = FunctionType::get(builder.getInt32Ty(), args, false);
     program.getOrInsertFunction("printf", type);
 
@@ -293,6 +301,12 @@ int main(int argc, char* argv[])
     /* start timers */
     auto dt_func = program.getFunction("start_delay_timer");
     builder.CreateCall(dt_func, { dt });
+
+    /* create RNG */
+    auto srand_func = program.getFunction("srand");
+    auto time_func = program.getFunction("time");
+    auto seed = builder.CreateCall(time_func, { builder.getInt32(0) });
+    builder.CreateCall(srand_func, { seed });
 
     handle_instructions(data, size, program, builder);
 
