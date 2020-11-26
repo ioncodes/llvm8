@@ -55,11 +55,10 @@ namespace utils
             inst->setMetadata("UNKNOWN", node);
         }
         
-        // GetInsertBlock returns shit?
         return &builder.GetInsertBlock()->back();
     }
 
-    template<typename _Type = Type, typename _Value = uint64_t>
+    template<typename _Type = Type, typename _Value = uint64_t> requires (std::is_same_v<_Type, ArrayType> || std::is_same_v<_Type, IntegerType>)
     GlobalVariable* create_global(Module& program, const std::string& name, _Type* type, std::vector<_Value> value = { 0 }, size_t offset = 0)
     {
         program.getOrInsertGlobal(name, type);
@@ -86,10 +85,6 @@ namespace utils
         else if constexpr (std::is_same_v<_Type, IntegerType>)
         {
             global->setInitializer(Constant::getIntegerValue(type, APInt(type->getPrimitiveSizeInBits(), value[0])));
-        }
-        else
-        {
-            static_assert(false, "unimplemented type");
         }
 
         return global;
