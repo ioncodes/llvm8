@@ -1,0 +1,18 @@
+            ; draw a random ball
+draw        ld          i, ball
+            rnd         v0, #3f
+            rnd         v1, #1f
+            drw         v0, v1, 1
+
+            ; wait a few seconds
+            ld          v4, 100
+            ld          dt, v4
+wait        ld          v4, dt
+            se          v4, 0
+            jp          wait
+
+            ; erase the ball
+            drw         v0, v1, 1
+            jp          draw
+
+ball        byte        %1.......

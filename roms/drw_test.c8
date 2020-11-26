@@ -1,0 +1,58 @@
+            ld          i, logo_l
+            ld          v0, 0
+            ld          v1, 0
+            drw         v0, v1, 7
+
+            ld          i, logo_a
+            ld          v0, 10
+            ld          v1, 0
+            drw         v0, v1, 7
+
+            ld          i, logo_y
+            ld          v0, 20
+            ld          v1, 0
+            drw         v0, v1, 7
+
+            ld          i, logo_l
+            ld          v0, 30
+            ld          v1, 0
+            drw         v0, v1, 7
+
+            ld          i, logo_e
+            ld          v0, 40
+            ld          v1, 0
+            drw         v0, v1, 7
+
+wait        jp          wait
+
+logo_l      byte        %11......
+            byte        %11......
+            byte        %11......
+            byte        %11......
+            byte        %11......
+            byte        %11......
+            byte        %11111111
+
+logo_a      byte        %...11...
+            byte        %.11..11.
+            byte        %11....11
+            byte        %11....11
+            byte        %11111111
+            byte        %11....11
+            byte        %11....11
+
+logo_y      byte        %1......1
+            byte        %.1....1.
+            byte        %..1..1..
+            byte        %...11...
+            byte        %...11...
+            byte        %...11...
+            byte        %...11...
+
+logo_e      byte        %11111111
+            byte        %11......
+            byte        %11......
+            byte        %11111111
+            byte        %11......
+            byte        %11......
+            byte        %11111111

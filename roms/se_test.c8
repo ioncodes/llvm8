@@ -1,0 +1,20 @@
+loop        ld          i, ball
+            ld          v3, 0
+            ld          v4, 0
+            ld          v5, 5
+            ld          v6, 10
+            
+            ld          v0, 0
+            ld          v1, 1
+            ld          v2, 2
+
+            sne         v0, 0
+            drw         v3, v4, 1
+            sne         v1, 1
+            drw         v3, v5, 1
+            sne         v2, 2
+            drw         v3, v6, 1
+
+            jp          loop
+
+ball        byte        %1.......

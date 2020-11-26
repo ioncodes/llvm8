@@ -1,0 +1,5 @@
+            ld          v0, 0
+loop        add         v0, 1
+            se          v0, 255
+            jp          loop
+wait        jp          wait

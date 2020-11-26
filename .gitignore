@@ -1,0 +1,6 @@
+build/
+.vscode/
+cmake-build-*/
+lib.ll
+test.bc
+test.exe
