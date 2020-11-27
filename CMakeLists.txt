@@ -34,7 +34,7 @@ endif()
 
 include_directories(include)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/instructions.hpp src/utils.hpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/instructions.hpp src/utils.hpp src/argparse.hpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE LLVM)
 
 # Set the plugin as the startup project

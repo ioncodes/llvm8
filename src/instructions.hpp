@@ -113,7 +113,6 @@ struct instruction
         builder.CreateStore(builder.getInt8(byte), v_reg);
     }
 
-    // TODO: what if se jumps to another se instruction?
     static void se(instruction_info& info, context_info& context)
     {
         auto reg = info.nibble<1>();
@@ -206,7 +205,7 @@ struct instruction
             auto sprt = builder.CreateInBoundsGEP(memory, { GetIntConstant(program, 0), i_64 });
             auto byte = builder.CreateLoad(sprt);
 
-            // copy each bit (pixel) to it's own byte in the screen buffer
+            // copy each bit (pixel) to its own byte in the screen buffer
             for (auto bit = 7; bit >= 0; bit--)
             {
                 // extract bit
@@ -315,6 +314,7 @@ struct instruction
         jp(info, context);
     }
 
+    // TODO: this is wrong
     static void ld_vx_i(instruction_info& info, context_info& context)
     {
         auto reg = info.nibble<1>();
@@ -362,8 +362,139 @@ struct instruction
     
     static void ld_b_vx(instruction_info& info, context_info& context)
     {
+        auto reg = info.nibble<1>();
+
         auto [program, builder] = context.ctx();
-        auto instr = log<false>(program, builder, fmt("ld B, V%x", info.nibble<1>()));
+        auto instr = log(program, builder, fmt("ld B, V%x", info.nibble<1>()));
+        context.instructions[info.address] = instr;
+
+        auto v_reg = program.getNamedGlobal(fmt("V%x", reg));
+        auto i_reg = program.getNamedGlobal("I");
+        auto memory = program.getNamedGlobal("memory");
+        auto value = builder.CreateLoad(v_reg);
+        auto dest = builder.CreateLoad(i_reg);
+        
+        auto v0 = builder.CreateSDiv(value, builder.getInt8(100));
+        auto v1 = builder.CreateSDiv(value, builder.getInt8(10));
+        v1 = builder.CreateSRem(v1, builder.getInt8(10));
+        auto v2 = builder.CreateSRem(value, builder.getInt8(100));
+        v2 = builder.CreateSRem(v2, builder.getInt8(10));
+
+        auto dest_64 = builder.CreateIntCast(dest, builder.getInt64Ty(), true);
+
+        Value* values[3] = { v0, v1, v2 };
+        for (int i = 0; i < 3; ++i)
+        {
+            auto dest = builder.CreateInBoundsGEP(memory, { GetIntConstant(program, 0), dest_64 });
+            builder.CreateStore(values[i], dest);
+            dest_64 = builder.CreateAdd(dest_64, builder.getInt64(1));
+        }
+    }
+
+    static void ld_i_vx(instruction_info& info, context_info& context)
+    {
+        auto reg = info.nibble<1>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log(program, builder, fmt("ld [I], V%x", reg));
+        context.instructions[info.address] = instr;
+
+        auto memory = program.getNamedGlobal("memory");
+        auto i_reg = program.getNamedGlobal("I");
+        auto v_reg = program.getNamedGlobal(fmt("V%x", reg));
+        auto value = builder.CreateLoad(v_reg);
+        auto deref = builder.CreateLoad(i_reg);
+        auto deref_64 = builder.CreateIntCast(deref, builder.getInt64Ty(), true);
+
+        auto dest = builder.CreateInBoundsGEP(memory, { GetIntConstant(program, 0), deref_64 });
+        builder.CreateStore(value, dest);
+    }
+
+    static void shr(instruction_info& info, context_info& context)
+    {
+        auto reg = info.nibble<1>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log<false>(program, builder, fmt("shr V%x", reg));
+        context.instructions[info.address] = instr;
+    }
+
+    static void shl(instruction_info& info, context_info& context)
+    {
+        auto reg = info.nibble<1>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log<false>(program, builder, fmt("shl V%x", reg));
+        context.instructions[info.address] = instr;
+    }
+
+    static void sub(instruction_info& info, context_info& context)
+    {
+        auto xreg = info.nibble<1>();
+        auto yreg = info.nibble<2>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log<false>(program, builder, fmt("sub V%x, V%x", xreg, yreg));
+        context.instructions[info.address] = instr;
+    }
+
+    static void xor_v_v(instruction_info& info, context_info& context)
+    {
+        auto xreg = info.nibble<1>();
+        auto yreg = info.nibble<2>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log<false>(program, builder, fmt("xor V%x, V%x", xreg, yreg));
+        context.instructions[info.address] = instr;
+    }
+
+    static void and_v_v(instruction_info& info, context_info& context)
+    {
+        auto xreg = info.nibble<1>();
+        auto yreg = info.nibble<2>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log<false>(program, builder, fmt("and V%x, V%x", xreg, yreg));
+        context.instructions[info.address] = instr;
+    }
+
+    static void or_v_v(instruction_info& info, context_info& context)
+    {
+        auto xreg = info.nibble<1>();
+        auto yreg = info.nibble<2>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log<false>(program, builder, fmt("or V%x, V%x", xreg, yreg));
+        context.instructions[info.address] = instr;
+    }
+
+    static void ld_v_v(instruction_info& info, context_info& context)
+    {
+        auto xreg = info.nibble<1>();
+        auto yreg = info.nibble<2>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log<false>(program, builder, fmt("ld V%x, V%x", xreg, yreg));
+        context.instructions[info.address] = instr;
+    }
+
+    static void se_v_v(instruction_info& info, context_info& context)
+    {
+        auto xreg = info.nibble<1>();
+        auto yreg = info.nibble<2>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log<false>(program, builder, fmt("se V%x, V%x", xreg, yreg));
+        context.instructions[info.address] = instr;
+    }
+
+    static void sne_v_v(instruction_info& info, context_info& context)
+    {
+        auto xreg = info.nibble<1>();
+        auto yreg = info.nibble<2>();
+
+        auto [program, builder] = context.ctx();
+        auto instr = log<false>(program, builder, fmt("sne V%x, V%x", xreg, yreg));
         context.instructions[info.address] = instr;
     }
 };

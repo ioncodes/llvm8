@@ -22,6 +22,7 @@
 #include <future>
 
 #include "instructions.hpp"
+#include "argparse.hpp"
 
 using namespace llvm;
 
@@ -30,8 +31,9 @@ static const std::unordered_map<uint16_t, instruction_t> INSTRUCTIONS =
 {
     { 0x00e0, instruction::cls },
     { 0x00ee, instruction::ret },
+    { 0xf055, instruction::ld_i_vx },
     { 0xf065, instruction::ld_vx_i },
-    { 0xf065, instruction::ld_b_vx },
+    { 0xf033, instruction::ld_b_vx },
     { 0xf01e, instruction::add_i_vx },
     { 0xf007, instruction::ld_vx_dt },
     { 0xf015, instruction::ld_dt_vx },
@@ -42,11 +44,20 @@ static const std::unordered_map<uint16_t, instruction_t> INSTRUCTIONS =
     { 0x6000, instruction::ld_reg },
     { 0x3000, instruction::se },
     { 0x4000, instruction::sne },
+    { 0x5000, instruction::se_v_v },
+    { 0x9000, instruction::sne_v_v },
     { 0xc000, instruction::rnd },
     { 0xd000, instruction::drw },
     { 0x2000, instruction::call },
     { 0x7000, instruction::add },
+    { 0x8000, instruction::ld_v_v },
+    { 0x8001, instruction::or_v_v },
+    { 0x8002, instruction::and_v_v },
+    { 0x8003, instruction::xor_v_v },
     { 0x8004, instruction::add_v_v },
+    { 0x8005, instruction::sub },
+    { 0x8006, instruction::shr },
+    { 0x800e, instruction::shl }
 };
  
 void handle_instructions(std::vector<uint8_t>& data, size_t size, Module& program, IRBuilder<NoFolder>& builder)
@@ -91,7 +102,7 @@ void handle_instructions(std::vector<uint8_t>& data, size_t size, Module& progra
 
             if (!ignore_skippable && context.skippable)
             {
-                if(!context.skippable->getTerminator())
+                if (!context.skippable->getTerminator())
                     builder.CreateBr(context.skippable);
                 builder.SetInsertPoint(context.skippable);
                 context.skippable = nullptr;
@@ -229,6 +240,15 @@ void remove_dead_blocks(Function* func)
     {
         basic_block->eraseFromParent();
     }
+}
+
+void parse_args(int argc, char* argv[])
+{
+    argparse::ArgumentParser program("llvm8");
+
+    program.add_argument("square")
+        .help("display the square of a given integer")
+        .action([](const std::string& value) { return std::stoi(value); });
 }
 
 int main(int argc, char* argv[])
