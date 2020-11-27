@@ -78,12 +78,14 @@ extern "C" void draw(char* screen)
         _SDL_SetRenderDrawColor(renderer, color, color, color, 255);
         _SDL_RenderDrawPoint(renderer, x, y);
 
-        /*
+        // todo: there seems to be a bug:
+        // fishie rom without printfs will show empty screen
+        // render thread doesnt catch up with the drw calls?
+        
         if (i % 64 == 0) printf("\n");
         
         if (screen[i] == 1) printf("x");
         else printf(" ");
-        */
     }
 
     _SDL_RenderPresent(renderer);
