@@ -60,12 +60,24 @@ static const std::unordered_map<uint16_t, instruction_t> INSTRUCTIONS =
     { 0x800e, instruction::shl }
 };
  
-void handle_instructions(std::vector<uint8_t>& data, size_t size, Module& program, IRBuilder<NoFolder>& builder)
+void handle_instructions(const std::vector<uint8_t>& data, const std::vector<std::pair<size_t, size_t>>& code_blocks, Module& program, IRBuilder<NoFolder>& builder)
 {
     context_info context{ program, builder };
 
-    for (size_t pc = 0; pc < size; pc += 2)
+    for (size_t pc = 0; pc < data.size(); pc += 2)
     {
+        bool is_code = false;
+        for (auto& [start, end] : code_blocks)
+        {
+            if (pc >= start && pc <= end)
+            {
+                is_code = true;
+                break;
+            }
+        }
+
+        if (!is_code) continue;
+
         auto instruction = (data[pc] << 8) | data[pc + 1];
 
         std::unordered_map<uint16_t, instruction_t>::const_iterator handler;
@@ -242,26 +254,76 @@ void remove_dead_blocks(Function* func)
     }
 }
 
-void parse_args(int argc, char* argv[])
+auto parse_args(int argc, char* argv[])
 {
+    /*
+        ./llvm8 --rom ./boot.ch8 --code 0-90
+    */
+
+    auto split = [](std::string value, const std::string& delimiter)
+    {
+        std::vector<std::string> splitted;
+        size_t pos = 0;
+        while ((pos = value.find(delimiter)) != std::string::npos)
+        {
+            splitted.push_back(value.substr(0, pos));
+            value.erase(0, pos + delimiter.size());
+        }
+
+        if (!value.empty())
+            splitted.push_back(value);
+
+        if (splitted.empty())
+            splitted.push_back(value);
+
+        return splitted;
+    };
+
+    auto extract_code_blocks = [&split](const std::string& value)
+    {
+        std::vector<std::pair<size_t, size_t>> code_blocks;
+        for (auto& range : split(value, ","))
+        {
+            auto ranges = split(range, "-");
+            code_blocks.push_back(std::make_pair(atoi(ranges[0].c_str()), atoi(ranges[1].c_str())));
+        }
+
+        return code_blocks;
+    };
+
     argparse::ArgumentParser program("llvm8");
 
-    program.add_argument("square")
-        .help("display the square of a given integer")
-        .action([](const std::string& value) { return std::stoi(value); });
+    program.add_argument("--rom")
+        .help("path to the rom file")
+        .required();
+    program.add_argument("--code")
+        .help("list of code blocks")
+        .required();
+
+    try
+    {
+        program.parse_args(argc, argv);
+    }
+    catch (const std::runtime_error& err)
+    {
+        std::cout << err.what() << std::endl;
+        std::cout << program;
+        exit(0);
+    }
+
+    auto rom = program.get("--rom");
+    auto code_blocks = extract_code_blocks(program.get("--code"));
+
+    return std::make_pair(rom, code_blocks);
 }
 
 int main(int argc, char* argv[])
 {
-    std::filesystem::path path{ argv[1] };
+    auto [rom, code_blocks] = parse_args(argc, argv);
+
+    std::filesystem::path path{ rom };
     auto data = utils::read_file(path);
     auto name = path.filename().string();
-    auto size = data.size();
-
-    if (argv[2])
-    {
-        size = atoi(argv[2]);
-    }
 
     LLVMContext context;
     IRBuilder<NoFolder> builder(context);
@@ -306,7 +368,8 @@ int main(int argc, char* argv[])
     auto seed = builder.CreateCall(time_func, { builder.getInt32(0) });
     builder.CreateCall(srand_func, { seed });
 
-    handle_instructions(data, size, program, builder);
+    /* lift instructions */
+    handle_instructions(data, code_blocks, program, builder);
 
     builder.CreateRetVoid();
 
