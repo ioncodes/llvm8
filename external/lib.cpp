@@ -9,7 +9,7 @@
 #include "SDL2/SDL.h"
 
 #define SCALE 16
-#define NOGUI
+//#define NOGUI
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
@@ -30,7 +30,7 @@ template<typename T>
 T* get_addr(void* module, const char* proc)
 {
     #ifdef _WIN32
-    return (T*)GetProcAddress(module, proc);
+    return (T*)GetProcAddress((HMODULE)module, proc);
     #else
     return (T*)dlsym(module, proc);
     #endif
@@ -113,7 +113,7 @@ extern "C" void draw(char* screen)
     #elif defined (__APPLE__)
     system("clear");
     #endif
-    #endif 
+    #endif
 
     for (int i = 0; i < 64 * 32; ++i)
     {
