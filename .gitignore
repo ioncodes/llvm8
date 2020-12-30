@@ -1,7 +1,10 @@
 build/
 .vscode/
+.ccls-cache/
 cmake-build-*/
 lib.ll
-test.bc
 test.exe
 test.obj
+test.bc
+test.o
+test
