@@ -58,6 +58,8 @@ extern "C" void init()
             while (_SDL_PollEvent(&event)) { }
         }
     }).detach();
+
+    while (!renderer || !window) {}
 }
 
 extern "C" void start_delay_timer(char& dt)
@@ -80,8 +82,6 @@ extern "C" void start_delay_timer(char& dt)
 
 extern "C" void draw(char* screen)
 {
-    while (!renderer || !window) {}
-
     for (int i = 0; i < 64 * 32; ++i)
     {
         int x = i % 64;
