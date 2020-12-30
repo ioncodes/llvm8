@@ -1,6 +1,6 @@
 #include <llvm/IR/Module.h>
-/*#include <llvm/IR/PassManager.h>
-#include <llvm/IR/Verifier.h>*/
+#include <llvm/IR/PassManager.h>
+#include <llvm/IR/Verifier.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/IR/NoFolder.h>
@@ -376,9 +376,9 @@ int main(int argc, char* argv[])
     //remove_dead_blocks(func);
     fill_non_terminated_blocks(func, builder);
 
-    /*printf("\n== Verification ==\n");
+    printf("\n== Verification ==\n");
     printf("Module: %d\n", !verifyModule(program, &outs()));
-    printf("Main: %d\n", !verifyFunction(*func, &outs()));*/
+    printf("Main: %d\n", !verifyFunction(*func, &outs()));
 
     printf("\n== Dump ==\n");
     program.dump();
