@@ -2,6 +2,7 @@ build/
 .vscode/
 .ccls-cache/
 cmake-build-*/
+.vs/
 lib.ll
 test.exe
 test.obj

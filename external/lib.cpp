@@ -133,7 +133,7 @@ extern "C" void draw(char* screen)
         
         if (screen[i] == 1) printf("x");
         else printf(" ");
-        #endif  
+        #endif
     }
 
     #ifndef NOGUI
