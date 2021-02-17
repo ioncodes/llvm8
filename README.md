@@ -47,5 +47,5 @@ There's also a bug where the UI can not be created on macOS but you can just ena
 
 ## Images?
 ![](images/instructions.png)
-![](images/llvn.png)
+![](images/llvm.png)
 ![](images/recompiled.gif)
