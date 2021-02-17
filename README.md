@@ -29,7 +29,7 @@ Open up the solution in your IDE and build it! The binary is called `llvm8{.exe}
 `llvm8` requires you to tell it which bytes are actually executable instructions (and not data), you can do so by providing a comma seperated list to `--code`. When in doubt just use `0-{FILE_SIZE_HERE}`. To find out the code paths use any CHIP8 disassembler or [this](https://github.com/massung/CHIP-8) emulator. To recompile a ROM execute the following command:
 
 ```sh
-; this assumes that llvm.exe is placed in the project root folder.
+# this assumes that llvm.exe is placed in the project root folder.
 llvm.exe --rom ./roms/boot.ch8 --code "0-88"
 ```
 
