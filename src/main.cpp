@@ -373,7 +373,7 @@ int main(int argc, char* argv[])
 
     builder.CreateRetVoid();
 
-    //remove_dead_blocks(func);
+    //remove_dead_blocks(func); 
     fill_non_terminated_blocks(func, builder);
 
     printf("\n== Verification ==\n");
