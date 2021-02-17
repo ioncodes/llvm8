@@ -42,7 +42,7 @@ make.bat boot.ch8.ll
 This will recompile it to a native image and start it up for debugging purposes.
 
 ## What is missing?
-A lot of instructions are currently missing (for example `call` & `ret`. I used a few test ROMs I found online to create a recompiler that works with most test ROMs I used. There is also no keyboard support but implementing that is just a matter of plugging SDLs keyboard support to the ROM registers.  
+A lot of instructions are currently missing (for example `call` & `ret`). I used a few test ROMs I found online to create a recompiler that works with most test ROMs I used. There is also no keyboard support but implementing that is just a matter of plugging SDLs keyboard support to the ROM registers.  
 There's also a bug where the UI can not be created on macOS but you can just enable the `NOGUI` flag in `external/lib.cpp` and it will output to the terminal instead.
 
 ## Images?
