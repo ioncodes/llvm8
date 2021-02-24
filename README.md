@@ -7,7 +7,7 @@ Lifting CHIP8 to LLVM and recompiling to any architecture.
 ## How does it work?
 Here's a rough overview of what is going on:
 
-1. Disassenble ROM file
+1. Disassemble ROM file
 2. Lift instructions to LLVM
 3. Write original ROM file to a global array in the LLVM bitcode
 4. Simulate CHIP8 architecture registers through global variables
