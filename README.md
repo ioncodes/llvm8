@@ -30,7 +30,7 @@ Open up the solution in your IDE and build it! The binary is called `llvm8{.exe}
 
 ```sh
 # this assumes that llvm.exe is placed in the project root folder.
-llvm.exe --rom ./roms/boot.ch8 --code "0-88"
+llvm8.exe --rom ./roms/boot.ch8 --code "0-88"
 ```
 
 This will write a new file called `boot.ch8.ll`. To recompile this to Windows or macOS use the `make.bat` and `make.sh` scripts respectively:
