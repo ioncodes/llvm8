@@ -29,8 +29,8 @@ Open up the solution in your IDE and build it! The binary is called `llvm8{.exe}
 `llvm8` requires you to tell it which bytes are actually executable instructions (and not data), you can do so by providing a comma seperated list to `--code`. When in doubt just use `0-{FILE_SIZE_HERE}`. To find out the code paths use any CHIP8 disassembler or [this](https://github.com/massung/CHIP-8) emulator. To recompile a ROM execute the following command:
 
 ```sh
-# this assumes that llvm.exe is placed in the project root folder.
-llvm.exe --rom ./roms/boot.ch8 --code "0-88"
+# this assumes that llvm8.exe is placed in the project root folder.
+llvm8.exe --rom ./roms/boot.ch8 --code "0-88"
 ```
 
 This will write a new file called `boot.ch8.ll`. To recompile this to Windows or macOS use the `make.bat` and `make.sh` scripts respectively:
